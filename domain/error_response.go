@@ -18,4 +18,8 @@ var (
 	ErrFailedToReadResponse      = errors.New("failed to read response")
 	ErrUnexpectedSigningMethod   = errors.New("unexpected signing method")
 	ErrInvalidToken              = errors.New("invalid token")
+	ErrEmailNotVerified          = errors.New("email not verified, please verify your email first")
+	ErrInvalidVerificationCode   = errors.New("invalid or expired verification code")
+	ErrUserAlreadyVerified       = errors.New("user is already verified")
+	ErrFailedToSendEmail         = errors.New("failed to send verification email")
 )

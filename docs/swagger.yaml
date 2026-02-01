@@ -1,0 +1,352 @@
+basePath: /api
+definitions:
+  domain.EmojiListResponse:
+    properties:
+      emojis:
+        items:
+          $ref: '#/definitions/domain.EmojiResponse'
+        type: array
+    type: object
+  domain.EmojiResponse:
+    properties:
+      emoji:
+        example: "\U0001F600"
+        type: string
+      index:
+        example: 0
+        type: integer
+    type: object
+  domain.ErrorResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  domain.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  domain.LoginResponse:
+    properties:
+      accessToken:
+        type: string
+      refreshToken:
+        type: string
+    type: object
+  domain.RefreshTokenRequest:
+    properties:
+      refreshToken:
+        type: string
+    required:
+    - refreshToken
+    type: object
+  domain.RefreshTokenResponse:
+    properties:
+      accessToken:
+        type: string
+      refreshToken:
+        type: string
+    type: object
+  domain.SignupRequest:
+    properties:
+      avatar_emoji:
+        example: 5
+        type: integer
+      email:
+        example: john@example.com
+        type: string
+      name:
+        example: John Doe
+        type: string
+      password:
+        example: password123
+        type: string
+    required:
+    - email
+    - name
+    - password
+    type: object
+  domain.SignupResponse:
+    properties:
+      accessToken:
+        type: string
+      refreshToken:
+        type: string
+    type: object
+  domain.UserResponse:
+    properties:
+      avatar_emoji:
+        type: integer
+      created_at:
+        type: string
+      email:
+        type: string
+      google_id:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      phone:
+        type: string
+    type: object
+  domain.UserUpdateRequest:
+    properties:
+      avatar_emoji:
+        example: 5
+        type: integer
+      email:
+        example: john@example.com
+        type: string
+      name:
+        example: John Doe
+        type: string
+      password:
+        example: newpassword123
+        type: string
+      phone:
+        example: "+1234567890"
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: REST API for Trading Chat application with user authentication and
+    management.
+  title: Trading Chat API
+  version: "1.0"
+paths:
+  /emojis:
+    get:
+      description: Returns a list of all available emojis that can be used as user
+        avatars
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of available emojis
+          schema:
+            $ref: '#/definitions/domain.EmojiListResponse'
+      summary: Get available avatar emojis
+      tags:
+      - Emojis
+  /google/callback:
+    get:
+      description: Handles the callback from Google OAuth and creates/logs in user
+      parameters:
+      - description: Authorization code from Google
+        in: query
+        name: code
+        required: true
+        type: string
+      - description: State parameter for CSRF protection
+        in: query
+        name: state
+        required: true
+        type: string
+      responses:
+        "307":
+          description: Redirect to home on error
+      summary: Google OAuth callback
+      tags:
+      - Authentication
+  /google/login:
+    get:
+      description: Redirects user to Google OAuth consent screen
+      responses:
+        "307":
+          description: Redirect to Google
+      summary: Initiate Google OAuth login
+      tags:
+      - Authentication
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate user with email and password
+      parameters:
+      - description: Login credentials
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/domain.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully logged in
+          schema:
+            $ref: '#/definitions/domain.LoginResponse'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      summary: Login user
+      tags:
+      - Authentication
+  /refresh_token:
+    post:
+      consumes:
+      - application/json
+      description: Get new access and refresh tokens using a valid refresh token
+      parameters:
+      - description: Refresh token
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/domain.RefreshTokenRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully refreshed tokens
+          schema:
+            $ref: '#/definitions/domain.RefreshTokenResponse'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      summary: Refresh access token
+      tags:
+      - Authentication
+  /signup:
+    post:
+      consumes:
+      - application/json
+      description: Create a new user account with email and password
+      parameters:
+      - description: Signup credentials
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/domain.SignupRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully registered
+          schema:
+            $ref: '#/definitions/domain.SignupResponse'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      summary: Register a new user
+      tags:
+      - Authentication
+  /user:
+    delete:
+      description: Delete the account of the currently authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete current user
+      tags:
+      - Users
+    get:
+      description: Get the profile of the currently authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User profile
+          schema:
+            $ref: '#/definitions/domain.UserResponse'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get current user
+      tags:
+      - Users
+    put:
+      consumes:
+      - application/json
+      description: Update the profile of the currently authenticated user
+      parameters:
+      - description: User data to update
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/domain.UserUpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update current user
+      tags:
+      - Users
+  /user/all:
+    get:
+      description: Retrieve a list of all users
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of users
+          schema:
+            items:
+              $ref: '#/definitions/domain.UserResponse'
+            type: array
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get all users
+      tags:
+      - Users
+securityDefinitions:
+  BearerAuth:
+    description: 'Enter your bearer token in the format: Bearer {token}'
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

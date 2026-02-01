@@ -20,6 +20,12 @@ type Env struct {
 	RefreshTokenSecret     string `mapstructure:"REFRESH_TOKEN_SECRET"`
 	GoogleClientID         string `mapstructure:"GOOGLE_CLIENT_ID"`
 	GoogleClientSecret     string `mapstructure:"GOOGLE_CLIENT_SECRET"`
+	// SMTP Configuration
+	SMTPHost     string `mapstructure:"SMTP_HOST"`
+	SMTPPort     int    `mapstructure:"SMTP_PORT"`
+	SMTPUser     string `mapstructure:"SMTP_USER"`
+	SMTPPassword string `mapstructure:"SMTP_PASSWORD"`
+	SMTPFrom     string `mapstructure:"SMTP_FROM"`
 }
 
 func NewEnv() *Env {

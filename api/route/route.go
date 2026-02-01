@@ -20,9 +20,11 @@ func Setup(env *bootstrap.Env, timeout time.Duration, db *sqlx.DB, r *mux.Router
 	protectedRouter.Use(middleware.JwtAuthMiddleware(env.AccessTokenSecret))
 	protectedRouter.Use(middleware.LoggerMiddleware)
 
+	NewEmojiRouter(public)
 	NewGoogleRouter(env, timeout, db, public)
 	NewSignupRouter(env, timeout, db, public)
 	NewLoginRouter(env, timeout, db, public)
 	NewRefreshTokenRouter(env, timeout, db, public)
 	NewUserRouter(env, timeout, db, protectedRouter)
+	NewVerificationRouter(env, timeout, db, public)
 }

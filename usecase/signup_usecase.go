@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"math/rand"
 	"time"
 
 	"github.com/Pro100-Almaz/trading-chat/bootstrap"
@@ -37,12 +38,20 @@ func (su *signupUseCase) SignUp(ctx context.Context, request domain.SignupReques
 
 	request.Password = string(encryptedPassword)
 
+	// Use provided emoji or assign a random one
+	avatarEmoji := rand.Intn(len(domain.AvatarEmojis))
+	if request.AvatarEmoji != nil && domain.IsValidEmojiIndex(*request.AvatarEmoji) {
+		avatarEmoji = *request.AvatarEmoji
+	}
+
 	now := time.Now()
 	user := &domain.User{
-		Email:     request.Email,
-		Password:  request.Password,
-		CreatedAt: now,
-		UpdatedAt: &now,
+		Name:        request.Name,
+		Email:       request.Email,
+		Password:    request.Password,
+		AvatarEmoji: avatarEmoji,
+		CreatedAt:   now,
+		UpdatedAt:   &now,
 	}
 
 	user, err = su.userRepository.CreateUser(ctx, user)

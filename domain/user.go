@@ -13,6 +13,7 @@ type User struct {
 	Password    string     `json:"password" db:"password"`
 	Email       string     `json:"email" db:"email"`
 	Phone       string     `json:"phone" db:"phone"`
+	IsVerified  bool       `json:"is_verified" db:"is_verified"`
 	CreatedAt   time.Time  `json:"created_at" db:"created_at"`
 	UpdatedAt   *time.Time `json:"updated_at" db:"updated_at"`
 }
@@ -24,6 +25,7 @@ type UserResponse struct {
 	Name        string    `json:"name" db:"name"`
 	Email       string    `json:"email" db:"email"`
 	Phone       string    `json:"phone" db:"phone"`
+	IsVerified  bool      `json:"is_verified" db:"is_verified"`
 	CreatedAt   time.Time `json:"created_at" db:"created_at"`
 }
 
