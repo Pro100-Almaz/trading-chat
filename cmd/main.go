@@ -7,13 +7,28 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/api/route"
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/bootstrap"
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/utils"
+	"github.com/Pro100-Almaz/trading-chat/api/route"
+	"github.com/Pro100-Almaz/trading-chat/bootstrap"
+	"github.com/Pro100-Almaz/trading-chat/utils"
+
+	_ "github.com/Pro100-Almaz/trading-chat/docs"
 
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
+	httpSwagger "github.com/swaggo/http-swagger"
 )
+
+// @title Trading Chat API
+// @version 1.0
+// @description REST API for Trading Chat application with user authentication and management.
+
+// @host localhost:8080
+// @BasePath /api
+
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+// @description Enter your bearer token in the format: Bearer {token}
 
 func main() {
 	app := bootstrap.App()
@@ -26,6 +41,12 @@ func main() {
 	timeout := time.Duration(env.ContextTimeout) * time.Second
 
 	r := mux.NewRouter()
+
+	// Swagger documentation route
+	r.PathPrefix("/swagger/").Handler(httpSwagger.Handler(
+		httpSwagger.URL("/swagger/doc.json"),
+		httpSwagger.DeepLinking(true),
+	))
 
 	route.Setup(env, timeout, db, r)
 
@@ -44,6 +65,7 @@ func main() {
 	}()
 
 	log.Info("server started")
+	log.Info("Swagger UI available at http://localhost:8080/swagger/index.html")
 
 	// Graceful Shutdown
 	c := make(chan os.Signal, 1)

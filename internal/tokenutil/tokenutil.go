@@ -3,9 +3,9 @@ package tokenutil
 import (
 	"time"
 
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/domain"
-
 	"github.com/golang-jwt/jwt/v4"
+
+	"github.com/Pro100-Almaz/trading-chat/domain"
 )
 
 func CreateAccessToken(user *domain.User, secret string, expiry int) (accessToken string, err error) {

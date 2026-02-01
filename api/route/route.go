@@ -3,8 +3,8 @@ package route
 import (
 	"time"
 
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/api/middleware"
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/bootstrap"
+	"github.com/Pro100-Almaz/trading-chat/api/middleware"
+	"github.com/Pro100-Almaz/trading-chat/bootstrap"
 
 	"github.com/gorilla/mux"
 	"github.com/jmoiron/sqlx"

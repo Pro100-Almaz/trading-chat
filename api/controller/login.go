@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/bootstrap"
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/domain"
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/utils"
+	"github.com/Pro100-Almaz/trading-chat/bootstrap"
+	"github.com/Pro100-Almaz/trading-chat/domain"
+	"github.com/Pro100-Almaz/trading-chat/utils"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -16,6 +16,16 @@ type LoginController struct {
 	Env          *bootstrap.Env
 }
 
+// Login godoc
+// @Summary Login user
+// @Description Authenticate user with email and password
+// @Tags Authentication
+// @Accept json
+// @Produce json
+// @Param request body domain.LoginRequest true "Login credentials"
+// @Success 200 {object} domain.LoginResponse "Successfully logged in"
+// @Failure 400 {object} domain.ErrorResponse "Bad request"
+// @Router /login [post]
 func (lc *LoginController) Login(w http.ResponseWriter, r *http.Request) {
 	var request domain.LoginRequest
 	ctx := r.Context()
@@ -39,5 +49,4 @@ func (lc *LoginController) Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	utils.JSON(w, http.StatusOK, response)
-	return
 }

@@ -3,7 +3,7 @@ package domain
 import (
 	"context"
 
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/bootstrap"
+	"github.com/Pro100-Almaz/trading-chat/bootstrap"
 )
 
 type RefreshTokenRequest struct {

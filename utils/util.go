@@ -19,13 +19,13 @@ func MigrateDB(db *sqlx.DB) {
 		CREATE TABLE IF NOT EXISTS users (
 		id SERIAL PRIMARY KEY,
 		google_id VARCHAR(255) DEFAULT '',
-		profile_picture VARCHAR(255) DEFAULT '',
+		avatar_emoji INTEGER DEFAULT 0,
 		name VARCHAR(255) DEFAULT '',
 		password VARCHAR(255) DEFAULT '',
 		email VARCHAR(255) NOT NULL UNIQUE,
 		phone VARCHAR(255) DEFAULT '',
 		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-		updated_at TIMESTAMP 
+		updated_at TIMESTAMP
 		);
 	`)
 }

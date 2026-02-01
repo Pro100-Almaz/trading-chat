@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/domain"
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/repository"
+	"github.com/Pro100-Almaz/trading-chat/domain"
+	"github.com/Pro100-Almaz/trading-chat/repository"
 )
 
 type userUseCase struct {
@@ -30,13 +30,13 @@ func (uu *userUseCase) GetUsers(c context.Context) ([]*domain.UserResponse, erro
 	}
 	for _, user := range users {
 		urs = append(urs, &domain.UserResponse{
-			Id:             user.Id,
-			GoogleId:       user.GoogleId,
-			ProfilePicture: user.ProfilePicture,
-			Name:           user.Name,
-			Email:          user.Email,
-			Phone:          user.Phone,
-			CreatedAt:      user.CreatedAt,
+			Id:          user.Id,
+			GoogleId:    user.GoogleId,
+			AvatarEmoji: user.AvatarEmoji,
+			Name:        user.Name,
+			Email:       user.Email,
+			Phone:       user.Phone,
+			CreatedAt:   user.CreatedAt,
 		})
 	}
 	return urs, nil
@@ -51,13 +51,13 @@ func (uu *userUseCase) GetUserById(c context.Context, id int) (*domain.UserRespo
 		return nil, err
 	}
 	ur = &domain.UserResponse{
-		Id:             user.Id,
-		GoogleId:       user.GoogleId,
-		ProfilePicture: user.ProfilePicture,
-		Name:           user.Name,
-		Email:          user.Email,
-		Phone:          user.Phone,
-		CreatedAt:      user.CreatedAt,
+		Id:          user.Id,
+		GoogleId:    user.GoogleId,
+		AvatarEmoji: user.AvatarEmoji,
+		Name:        user.Name,
+		Email:       user.Email,
+		Phone:       user.Phone,
+		CreatedAt:   user.CreatedAt,
 	}
 	return ur, nil
 }

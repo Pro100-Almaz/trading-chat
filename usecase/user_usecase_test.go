@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/domain"
+	"github.com/Pro100-Almaz/trading-chat/domain"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"

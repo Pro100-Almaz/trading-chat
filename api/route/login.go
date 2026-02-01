@@ -3,12 +3,12 @@ package route
 import (
 	"time"
 
+	"github.com/Pro100-Almaz/trading-chat/api/controller"
+	"github.com/Pro100-Almaz/trading-chat/bootstrap"
+	"github.com/Pro100-Almaz/trading-chat/repository"
+	"github.com/Pro100-Almaz/trading-chat/usecase"
 	"github.com/gorilla/mux"
 	"github.com/jmoiron/sqlx"
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/api/controller"
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/bootstrap"
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/repository"
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/usecase"
 )
 
 func NewLoginRouter(env *bootstrap.Env, timeout time.Duration, db *sqlx.DB, r *mux.Router) {

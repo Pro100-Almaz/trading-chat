@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/bootstrap"
+	"github.com/Pro100-Almaz/trading-chat/bootstrap"
 
 	"golang.org/x/oauth2"
 )

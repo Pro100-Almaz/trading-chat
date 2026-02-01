@@ -4,10 +4,10 @@ import (
 	"context"
 	"time"
 
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/bootstrap"
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/domain"
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/internal/tokenutil"
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/repository"
+	"github.com/Pro100-Almaz/trading-chat/bootstrap"
+	"github.com/Pro100-Almaz/trading-chat/domain"
+	"github.com/Pro100-Almaz/trading-chat/internal/tokenutil"
+	"github.com/Pro100-Almaz/trading-chat/repository"
 
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
@@ -37,11 +37,12 @@ func (su *signupUseCase) SignUp(ctx context.Context, request domain.SignupReques
 
 	request.Password = string(encryptedPassword)
 
+	now := time.Now()
 	user := &domain.User{
 		Email:     request.Email,
 		Password:  request.Password,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		CreatedAt: now,
+		UpdatedAt: &now,
 	}
 
 	user, err = su.userRepository.CreateUser(ctx, user)

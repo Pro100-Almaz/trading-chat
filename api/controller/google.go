@@ -3,9 +3,9 @@ package controller
 import (
 	"net/http"
 
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/bootstrap"
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/domain"
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/utils"
+	"github.com/Pro100-Almaz/trading-chat/bootstrap"
+	"github.com/Pro100-Almaz/trading-chat/domain"
+	"github.com/Pro100-Almaz/trading-chat/utils"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
@@ -27,6 +27,12 @@ var googleOauthConfig = &oauth2.Config{
 	Endpoint: google.Endpoint,
 }
 
+// HandleGoogleLogin godoc
+// @Summary Initiate Google OAuth login
+// @Description Redirects user to Google OAuth consent screen
+// @Tags Authentication
+// @Success 307 "Redirect to Google"
+// @Router /google/login [get]
 func (gc *GoogleController) HandleGoogleLogin(w http.ResponseWriter, r *http.Request) {
 	oauthState := gc.GoogleUseCase.GenerateStateOauthCookie(w)
 	googleOauthConfig.ClientSecret = gc.Env.GoogleClientSecret
@@ -36,6 +42,15 @@ func (gc *GoogleController) HandleGoogleLogin(w http.ResponseWriter, r *http.Req
 	http.Redirect(w, r, u, http.StatusTemporaryRedirect)
 }
 
+// HandleGoogleCallback godoc
+// @Summary Google OAuth callback
+// @Description Handles the callback from Google OAuth and creates/logs in user
+// @Tags Authentication
+// @Param code query string true "Authorization code from Google"
+// @Param state query string true "State parameter for CSRF protection"
+// @Success 307 "Redirect to profile page with auth cookies"
+// @Failure 307 "Redirect to home on error"
+// @Router /google/callback [get]
 func (gc *GoogleController) HandleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	googleOauthConfig.ClientSecret = gc.Env.GoogleClientSecret

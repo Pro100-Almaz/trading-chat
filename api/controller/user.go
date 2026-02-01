@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/bootstrap"
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/domain"
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/utils"
+	"github.com/Pro100-Almaz/trading-chat/bootstrap"
+	"github.com/Pro100-Almaz/trading-chat/domain"
+	"github.com/Pro100-Almaz/trading-chat/utils"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -19,6 +19,16 @@ type UserController struct {
 	Env         *bootstrap.Env
 }
 
+// GetUsers godoc
+// @Summary Get all users
+// @Description Retrieve a list of all users
+// @Tags Users
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {array} domain.UserResponse "List of users"
+// @Failure 400 {object} domain.ErrorResponse "Bad request"
+// @Failure 401 {object} domain.ErrorResponse "Unauthorized"
+// @Router /user/all [get]
 func (uc *UserController) GetUsers(w http.ResponseWriter, r *http.Request) {
 	ctx := context.WithValue(r.Context(), "user_id", r.Context().Value("user_id"))
 
@@ -30,9 +40,18 @@ func (uc *UserController) GetUsers(w http.ResponseWriter, r *http.Request) {
 	}
 
 	utils.JSON(w, http.StatusOK, users)
-	return
 }
 
+// GetUserById godoc
+// @Summary Get current user
+// @Description Get the profile of the currently authenticated user
+// @Tags Users
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} domain.UserResponse "User profile"
+// @Failure 400 {object} domain.ErrorResponse "Bad request"
+// @Failure 401 {object} domain.ErrorResponse "Unauthorized"
+// @Router /user [get]
 func (uc *UserController) GetUserById(w http.ResponseWriter, r *http.Request) {
 	ctx := context.WithValue(r.Context(), "user_id", r.Context().Value("user_id"))
 
@@ -53,9 +72,20 @@ func (uc *UserController) GetUserById(w http.ResponseWriter, r *http.Request) {
 	}
 
 	utils.JSON(w, http.StatusOK, user)
-	return
 }
 
+// UpdateUser godoc
+// @Summary Update current user
+// @Description Update the profile of the currently authenticated user
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body domain.UserUpdateRequest true "User data to update"
+// @Success 200 {string} string "Success"
+// @Failure 400 {object} domain.ErrorResponse "Bad request"
+// @Failure 401 {object} domain.ErrorResponse "Unauthorized"
+// @Router /user [put]
 func (uc *UserController) UpdateUser(w http.ResponseWriter, r *http.Request) {
 	ctx := context.WithValue(r.Context(), "user_id", r.Context().Value("user_id"))
 
@@ -85,9 +115,18 @@ func (uc *UserController) UpdateUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	utils.JSON(w, http.StatusOK, "Success")
-	return
 }
 
+// DeleteUser godoc
+// @Summary Delete current user
+// @Description Delete the account of the currently authenticated user
+// @Tags Users
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {string} string "Success"
+// @Failure 400 {object} domain.ErrorResponse "Bad request"
+// @Failure 401 {object} domain.ErrorResponse "Unauthorized"
+// @Router /user [delete]
 func (uc *UserController) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	ctx := context.WithValue(r.Context(), "user_id", r.Context().Value("user_id"))
 
@@ -106,5 +145,4 @@ func (uc *UserController) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	utils.JSON(w, http.StatusOK, "Success")
-	return
 }

@@ -9,7 +9,8 @@ A RESTful API backend built with Go following Clean Architecture principles. Fea
 - **JWT Authentication** - Access and refresh token system
 - **User CRUD Operations** - Full user management API
 - **Clean Architecture** - Layered, testable, maintainable codebase
-- **MySQL Database** - Persistent data storage
+- **PostgreSQL Database** - Persistent data storage
+- **Swagger Documentation** - Interactive API documentation
 
 ## Tech Stack
 
@@ -17,10 +18,11 @@ A RESTful API backend built with Go following Clean Architecture principles. Fea
 |----------|------------|
 | Language | Go 1.19+ |
 | Router | gorilla/mux |
-| Database | MySQL with sqlx |
+| Database | PostgreSQL with sqlx |
 | Auth | JWT (golang-jwt), bcrypt, OAuth2 |
 | Config | Viper |
 | Logging | Logrus |
+| API Docs | Swagger (swaggo) |
 
 ## Project Structure
 
@@ -98,7 +100,7 @@ The project follows Clean Architecture with clear separation of concerns:
 └────────────────────────────┬────────────────────────────────┘
                              │
 ┌────────────────────────────▼────────────────────────────────┐
-│                      MySQL Database                          │
+│                    PostgreSQL Database                       │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -107,6 +109,24 @@ The project follows Clean Architecture with clear separation of concerns:
 - **Use Cases**: Business logic, orchestrate operations
 - **Repositories**: Database queries, data persistence
 - **Domain**: Data models, interfaces, error definitions
+
+## API Documentation (Swagger)
+
+Interactive API documentation is available at:
+
+```
+http://localhost:8080/swagger/index.html
+```
+
+To regenerate Swagger docs after making changes to API annotations:
+
+```bash
+# Install swag CLI (one-time)
+go install github.com/swaggo/swag/cmd/swag@latest
+
+# Generate docs
+swag init -g cmd/main.go -o docs
+```
 
 ## API Endpoints
 
@@ -220,7 +240,7 @@ Response:
 ### Prerequisites
 
 - Go 1.19 or higher
-- MySQL 5.7+ or 8.0
+- PostgreSQL 12+
 - (Optional) Google Cloud Console project for OAuth
 
 ### Installation
@@ -242,8 +262,12 @@ Response:
    ```
    Edit `.env` with your configuration (see Configuration section below).
 
-4. **Set up MySQL database**
-   ```sql
+4. **Set up PostgreSQL database**
+   ```bash
+   # Connect to PostgreSQL
+   psql -U postgres
+
+   # Create database
    CREATE DATABASE trading_chat;
    ```
    The application will auto-migrate the `users` table on startup.
@@ -266,10 +290,10 @@ SERVER_ADDRESS=:8080
 PORT=8080
 CONTEXT_TIMEOUT=2
 
-# Database
+# Database (PostgreSQL)
 DB_HOST=localhost
-DB_PORT=3306
-DB_USER=root
+DB_PORT=5432
+DB_USER=postgres
 DB_PASS=your_password
 DB_NAME=trading_chat
 
@@ -290,10 +314,10 @@ GOOGLE_CLIENT_SECRET=your_google_client_secret
 | `SERVER_ADDRESS` | Server listen address | `:8080` |
 | `PORT` | Server port | `8080` |
 | `CONTEXT_TIMEOUT` | Request timeout in seconds | `2` |
-| `DB_HOST` | MySQL host | - |
-| `DB_PORT` | MySQL port | `3306` |
-| `DB_USER` | MySQL username | - |
-| `DB_PASS` | MySQL password | - |
+| `DB_HOST` | PostgreSQL host | - |
+| `DB_PORT` | PostgreSQL port | `5432` |
+| `DB_USER` | PostgreSQL username | - |
+| `DB_PASS` | PostgreSQL password | - |
 | `DB_NAME` | Database name | - |
 | `ACCESS_TOKEN_EXPIRY_HOUR` | Access token lifetime (hours) | `2` |
 | `REFRESH_TOKEN_EXPIRY_HOUR` | Refresh token lifetime (hours) | `168` (7 days) |
@@ -313,6 +337,51 @@ GOOGLE_CLIENT_SECRET=your_google_client_secret
 7. Copy Client ID and Client Secret to your `.env` file
 
 ## Running with Docker
+
+### Using Docker Compose (Recommended)
+
+The easiest way to run the application with PostgreSQL:
+
+```bash
+# Start PostgreSQL database
+docker-compose up -d
+
+# Check if database is ready
+docker-compose ps
+
+# View database logs
+docker-compose logs db
+```
+
+This starts a PostgreSQL 16 container with:
+- **Database**: `myapp`
+- **User**: `myapp`
+- **Password**: `myapp_pass`
+- **Port**: `5433` (mapped to container's `5432`)
+
+Update your `.env` file to match:
+```env
+DB_HOST=localhost
+DB_PORT=5433
+DB_USER=myapp
+DB_PASS=myapp_pass
+DB_NAME=myapp
+```
+
+Then run the application:
+```bash
+go run cmd/main.go
+```
+
+To stop the database:
+```bash
+docker-compose down
+
+# To also remove the data volume:
+docker-compose down -v
+```
+
+### Using Docker Only
 
 ```bash
 # Build the image

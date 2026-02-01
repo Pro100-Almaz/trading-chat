@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/bootstrap"
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/domain"
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/utils"
+	"github.com/Pro100-Almaz/trading-chat/bootstrap"
+	"github.com/Pro100-Almaz/trading-chat/domain"
+	"github.com/Pro100-Almaz/trading-chat/utils"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -16,6 +16,16 @@ type SignupController struct {
 	Env           *bootstrap.Env
 }
 
+// Signup godoc
+// @Summary Register a new user
+// @Description Create a new user account with email and password
+// @Tags Authentication
+// @Accept json
+// @Produce json
+// @Param request body domain.SignupRequest true "Signup credentials"
+// @Success 200 {object} domain.SignupResponse "Successfully registered"
+// @Failure 400 {object} domain.ErrorResponse "Bad request"
+// @Router /signup [post]
 func (sc *SignupController) Signup(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	var request domain.SignupRequest
@@ -39,5 +49,4 @@ func (sc *SignupController) Signup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	utils.JSON(w, http.StatusOK, signupResponse)
-	return
 }

@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/bootstrap"
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/domain"
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/utils"
+	"github.com/Pro100-Almaz/trading-chat/bootstrap"
+	"github.com/Pro100-Almaz/trading-chat/domain"
+	"github.com/Pro100-Almaz/trading-chat/utils"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -16,6 +16,16 @@ type RefreshTokenController struct {
 	Env                 *bootstrap.Env
 }
 
+// RefreshToken godoc
+// @Summary Refresh access token
+// @Description Get new access and refresh tokens using a valid refresh token
+// @Tags Authentication
+// @Accept json
+// @Produce json
+// @Param request body domain.RefreshTokenRequest true "Refresh token"
+// @Success 200 {object} domain.RefreshTokenResponse "Successfully refreshed tokens"
+// @Failure 400 {object} domain.ErrorResponse "Bad request"
+// @Router /refresh_token [post]
 func (rtc *RefreshTokenController) RefreshToken(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	var request domain.RefreshTokenRequest
@@ -39,5 +49,4 @@ func (rtc *RefreshTokenController) RefreshToken(w http.ResponseWriter, r *http.R
 	}
 
 	utils.JSON(w, http.StatusOK, refreshTokenResponse)
-	return
 }

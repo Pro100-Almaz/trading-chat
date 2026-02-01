@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/domain"
+	"github.com/Pro100-Almaz/trading-chat/domain"
 
 	"github.com/jmoiron/sqlx"
 	"golang.org/x/crypto/bcrypt"
@@ -68,8 +68,8 @@ func (r *userRepository) CreateUser(ctx context.Context, user *domain.User) (*do
 	if user.GoogleId != "" {
 		var id int
 		err := tx.QueryRowContext(ctx,
-			`INSERT INTO users (email, google_id, name, profile_picture) VALUES ($1, $2, $3, $4) RETURNING id`,
-			user.Email, user.GoogleId, user.Name, user.ProfilePicture,
+			`INSERT INTO users (email, google_id, name, avatar_emoji) VALUES ($1, $2, $3, $4) RETURNING id`,
+			user.Email, user.GoogleId, user.Name, user.AvatarEmoji,
 		).Scan(&id)
 		if err != nil {
 			tx.Rollback()
@@ -81,8 +81,8 @@ func (r *userRepository) CreateUser(ctx context.Context, user *domain.User) (*do
 
 	var id int
 	err = tx.QueryRowContext(ctx,
-		`INSERT INTO users (email, password) VALUES ($1, $2) RETURNING id`,
-		user.Email, user.Password,
+		`INSERT INTO users (email, password, avatar_emoji) VALUES ($1, $2, $3) RETURNING id`,
+		user.Email, user.Password, user.AvatarEmoji,
 	).Scan(&id)
 	if err != nil {
 		tx.Rollback()
@@ -123,6 +123,13 @@ func (r *userRepository) UpdateUser(ctx context.Context, user *domain.User) erro
 	}
 	if user.Phone != "" {
 		fieldsQuery += "phone = :phone,"
+	}
+	if user.AvatarEmoji > 0 {
+		fieldsQuery += "avatar_emoji = :avatar_emoji,"
+	}
+
+	if fieldsQuery == "" {
+		return nil
 	}
 	fieldsQuery = fieldsQuery[:len(fieldsQuery)-1]
 

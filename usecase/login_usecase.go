@@ -4,10 +4,10 @@ import (
 	"context"
 	"time"
 
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/bootstrap"
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/domain"
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/internal/tokenutil"
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/repository"
+	"github.com/Pro100-Almaz/trading-chat/bootstrap"
+	"github.com/Pro100-Almaz/trading-chat/domain"
+	"github.com/Pro100-Almaz/trading-chat/internal/tokenutil"
+	"github.com/Pro100-Almaz/trading-chat/repository"
 
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"

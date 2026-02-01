@@ -7,13 +7,14 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"io"
+	mrand "math/rand"
 	"net/http"
 	"time"
 
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/bootstrap"
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/domain"
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/internal/tokenutil"
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/repository"
+	"github.com/Pro100-Almaz/trading-chat/bootstrap"
+	"github.com/Pro100-Almaz/trading-chat/domain"
+	"github.com/Pro100-Almaz/trading-chat/internal/tokenutil"
+	"github.com/Pro100-Almaz/trading-chat/repository"
 
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/oauth2"
@@ -39,11 +40,14 @@ func (lu *googleUseCase) GoogleLogin(ctx context.Context, data []byte, env *boot
 		return
 	}
 
+	// Assign a random emoji avatar for new Google users
+	randomEmoji := mrand.Intn(len(domain.AvatarEmojis))
+
 	user := &domain.User{
-		GoogleId:       googleUser.Id,
-		ProfilePicture: googleUser.Picture,
-		Email:          googleUser.Email,
-		Name:           googleUser.Name,
+		GoogleId:    googleUser.Id,
+		AvatarEmoji: randomEmoji,
+		Email:       googleUser.Email,
+		Name:        googleUser.Name,
 	}
 
 	var existingUser *domain.User

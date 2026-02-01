@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/domain"
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/internal/tokenutil"
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/utils"
+	"github.com/Pro100-Almaz/trading-chat/domain"
+	"github.com/Pro100-Almaz/trading-chat/internal/tokenutil"
+	"github.com/Pro100-Almaz/trading-chat/utils"
 )
 
 func JwtAuthMiddleware(secret string) func(next http.Handler) http.Handler {
