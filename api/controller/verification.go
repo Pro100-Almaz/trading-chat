@@ -28,8 +28,6 @@ func (vc *VerificationController) VerifyEmail(w http.ResponseWriter, r *http.Req
 	ctx := r.Context()
 	var request domain.VerifyEmailRequest
 
-	log.Infof("")
-
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		log.Error(err)
 		utils.JSON(w, http.StatusBadRequest, domain.ErrorResponse{Message: err.Error()})

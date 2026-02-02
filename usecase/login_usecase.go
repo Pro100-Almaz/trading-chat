@@ -45,6 +45,12 @@ func (lu *loginUseCase) Login(ctx context.Context, request domain.LoginRequest, 
 		return
 	}
 
+	if !user.IsVerified {
+		log.Error("Email not verified")
+		err = domain.ErrEmailNotVerified
+		return
+	}
+
 	accessToken, err = tokenutil.CreateAccessToken(user, env.AccessTokenSecret, env.AccessTokenExpiryHour)
 	if err != nil {
 		log.Error(err)

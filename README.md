@@ -122,7 +122,7 @@ To regenerate Swagger docs after making changes to API annotations:
 
 ```bash
 # Install swag CLI (one-time)
-go install github.com/swaggo/swag/cmd/swag@latest
+go install github.com/swaggo/swag/cmd/swag@latest && ~/go/bin/swag init -g cmd/main.go -o docs
 
 # Generate docs
 swag init -g cmd/main.go -o docs

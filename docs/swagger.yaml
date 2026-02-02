@@ -52,6 +52,14 @@ definitions:
       refreshToken:
         type: string
     type: object
+  domain.ResendVerificationRequest:
+    properties:
+      email:
+        example: john@example.com
+        type: string
+    required:
+    - email
+    type: object
   domain.SignupRequest:
     properties:
       avatar_emoji:
@@ -73,9 +81,9 @@ definitions:
     type: object
   domain.SignupResponse:
     properties:
-      accessToken:
+      email:
         type: string
-      refreshToken:
+      message:
         type: string
     type: object
   domain.UserResponse:
@@ -90,6 +98,8 @@ definitions:
         type: string
       id:
         type: integer
+      is_verified:
+        type: boolean
       name:
         type: string
       phone:
@@ -112,6 +122,24 @@ definitions:
       phone:
         example: "+1234567890"
         type: string
+    type: object
+  domain.VerificationResponse:
+    properties:
+      message:
+        example: Email verified successfully
+        type: string
+    type: object
+  domain.VerifyEmailRequest:
+    properties:
+      code:
+        example: "123456"
+        type: string
+      email:
+        example: john@example.com
+        type: string
+    required:
+    - code
+    - email
     type: object
 host: localhost:8080
 info:
@@ -216,11 +244,38 @@ paths:
       summary: Refresh access token
       tags:
       - Authentication
+  /resend-verification:
+    post:
+      consumes:
+      - application/json
+      description: Resend a new verification code to the user's email
+      parameters:
+      - description: User email
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/domain.ResendVerificationRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Verification code sent
+          schema:
+            $ref: '#/definitions/domain.VerificationResponse'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      summary: Resend verification code
+      tags:
+      - Verification
   /signup:
     post:
       consumes:
       - application/json
-      description: Create a new user account with email and password
+      description: Create a new user account with email and password. A verification
+        code will be sent to the email.
       parameters:
       - description: Signup credentials
         in: body
@@ -231,8 +286,8 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: Successfully registered
+        "201":
+          description: Account created, verification email sent
           schema:
             $ref: '#/definitions/domain.SignupResponse'
         "400":
@@ -343,6 +398,33 @@ paths:
       summary: Get all users
       tags:
       - Users
+  /verify-email:
+    post:
+      consumes:
+      - application/json
+      description: Verify user's email address using the 6-digit code sent to their
+        email
+      parameters:
+      - description: Email and verification code
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/domain.VerifyEmailRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Email verified successfully
+          schema:
+            $ref: '#/definitions/domain.VerificationResponse'
+        "400":
+          description: Bad request or invalid code
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      summary: Verify email with code
+      tags:
+      - Verification
 securityDefinitions:
   BearerAuth:
     description: 'Enter your bearer token in the format: Bearer {token}'

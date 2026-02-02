@@ -1,10 +1,6 @@
 package domain
 
-import (
-	"context"
-
-	"github.com/Pro100-Almaz/trading-chat/bootstrap"
-)
+import "context"
 
 type SignupRequest struct {
 	Name        string `json:"name" binding:"required" example:"John Doe"`
@@ -14,10 +10,10 @@ type SignupRequest struct {
 }
 
 type SignupResponse struct {
-	AccessToken  string `json:"accessToken"`
-	RefreshToken string `json:"refreshToken"`
+	Message string `json:"message"`
+	Email   string `json:"email"`
 }
 
 type SignupUseCase interface {
-	SignUp(ctx context.Context, request SignupRequest, env *bootstrap.Env) (accessToken string, refreshToken string, err error)
+	SignUp(ctx context.Context, request SignupRequest) error
 }

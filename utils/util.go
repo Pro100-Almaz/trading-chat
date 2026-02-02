@@ -43,6 +43,9 @@ func MigrateDB(db *sqlx.DB) {
 		);
 	`)
 
+	// Create index on verification_codes for faster lookups
+	db.MustExec(`CREATE INDEX IF NOT EXISTS idx_verification_codes_user_id ON verification_codes(user_id)`)
+
 	// Migration: rename profile_picture to avatar_emoji if old column exists
 	var columnExists bool
 	err := db.Get(&columnExists, `

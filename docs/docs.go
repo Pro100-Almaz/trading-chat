@@ -159,9 +159,49 @@ const docTemplate = `{
                 }
             }
         },
+        "/resend-verification": {
+            "post": {
+                "description": "Resend a new verification code to the user's email",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Verification"
+                ],
+                "summary": "Resend verification code",
+                "parameters": [
+                    {
+                        "description": "User email",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/domain.ResendVerificationRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Verification code sent",
+                        "schema": {
+                            "$ref": "#/definitions/domain.VerificationResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/domain.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/signup": {
             "post": {
-                "description": "Create a new user account with email and password",
+                "description": "Create a new user account with email and password. A verification code will be sent to the email.",
                 "consumes": [
                     "application/json"
                 ],
@@ -184,8 +224,8 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "Successfully registered",
+                    "201": {
+                        "description": "Account created, verification email sent",
                         "schema": {
                             "$ref": "#/definitions/domain.SignupResponse"
                         }
@@ -359,6 +399,46 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/verify-email": {
+            "post": {
+                "description": "Verify user's email address using the 6-digit code sent to their email",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Verification"
+                ],
+                "summary": "Verify email with code",
+                "parameters": [
+                    {
+                        "description": "Email and verification code",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/domain.VerifyEmailRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Email verified successfully",
+                        "schema": {
+                            "$ref": "#/definitions/domain.VerificationResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request or invalid code",
+                        "schema": {
+                            "$ref": "#/definitions/domain.ErrorResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -442,6 +522,18 @@ const docTemplate = `{
                 }
             }
         },
+        "domain.ResendVerificationRequest": {
+            "type": "object",
+            "required": [
+                "email"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "example": "john@example.com"
+                }
+            }
+        },
         "domain.SignupRequest": {
             "type": "object",
             "required": [
@@ -471,10 +563,10 @@ const docTemplate = `{
         "domain.SignupResponse": {
             "type": "object",
             "properties": {
-                "accessToken": {
+                "email": {
                     "type": "string"
                 },
-                "refreshToken": {
+                "message": {
                     "type": "string"
                 }
             }
@@ -496,6 +588,9 @@ const docTemplate = `{
                 },
                 "id": {
                     "type": "integer"
+                },
+                "is_verified": {
+                    "type": "boolean"
                 },
                 "name": {
                     "type": "string"
@@ -527,6 +622,32 @@ const docTemplate = `{
                 "phone": {
                     "type": "string",
                     "example": "+1234567890"
+                }
+            }
+        },
+        "domain.VerificationResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "Email verified successfully"
+                }
+            }
+        },
+        "domain.VerifyEmailRequest": {
+            "type": "object",
+            "required": [
+                "code",
+                "email"
+            ],
+            "properties": {
+                "code": {
+                    "type": "string",
+                    "example": "123456"
+                },
+                "email": {
+                    "type": "string",
+                    "example": "john@example.com"
                 }
             }
         }

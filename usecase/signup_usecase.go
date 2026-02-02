@@ -5,9 +5,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/Pro100-Almaz/trading-chat/bootstrap"
 	"github.com/Pro100-Almaz/trading-chat/domain"
-	"github.com/Pro100-Almaz/trading-chat/internal/tokenutil"
 	"github.com/Pro100-Almaz/trading-chat/repository"
 
 	log "github.com/sirupsen/logrus"
@@ -15,25 +13,27 @@ import (
 )
 
 type signupUseCase struct {
-	userRepository repository.UserRepository
-	contextTimeout time.Duration
+	userRepository      repository.UserRepository
+	verificationUseCase domain.VerificationUseCase
+	contextTimeout      time.Duration
 }
 
-func NewSignupUseCase(userRepository repository.UserRepository, timeout time.Duration) domain.SignupUseCase {
+func NewSignupUseCase(userRepository repository.UserRepository, verificationUseCase domain.VerificationUseCase, timeout time.Duration) domain.SignupUseCase {
 	return &signupUseCase{
-		userRepository: userRepository,
-		contextTimeout: timeout,
+		userRepository:      userRepository,
+		verificationUseCase: verificationUseCase,
+		contextTimeout:      timeout,
 	}
 }
 
-func (su *signupUseCase) SignUp(ctx context.Context, request domain.SignupRequest, env *bootstrap.Env) (accessToken string, refreshToken string, err error) {
+func (su *signupUseCase) SignUp(ctx context.Context, request domain.SignupRequest) error {
 	encryptedPassword, err := bcrypt.GenerateFromPassword(
 		[]byte(request.Password),
 		bcrypt.DefaultCost,
 	)
 	if err != nil {
 		log.Error(err)
-		return
+		return err
 	}
 
 	request.Password = string(encryptedPassword)
@@ -57,20 +57,15 @@ func (su *signupUseCase) SignUp(ctx context.Context, request domain.SignupReques
 	user, err = su.userRepository.CreateUser(ctx, user)
 	if err != nil {
 		log.Error(err)
-		return
+		return err
 	}
 
-	accessToken, err = tokenutil.CreateAccessToken(user, env.AccessTokenSecret, env.AccessTokenExpiryHour)
+	// Send verification code to user's email
+	err = su.verificationUseCase.SendVerificationCode(ctx, user.Id, user.Email)
 	if err != nil {
-		log.Error(err)
-		return
+		log.Error("Failed to send verification code: ", err)
+		return err
 	}
 
-	refreshToken, err = tokenutil.CreateRefreshToken(user, env.RefreshTokenSecret, env.RefreshTokenExpiryHour)
-	if err != nil {
-		log.Error(err)
-		return
-	}
-
-	return
+	return nil
 }
