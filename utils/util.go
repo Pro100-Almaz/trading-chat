@@ -46,6 +46,58 @@ func MigrateDB(db *sqlx.DB) {
 	// Create index on verification_codes for faster lookups
 	db.MustExec(`CREATE INDEX IF NOT EXISTS idx_verification_codes_user_id ON verification_codes(user_id)`)
 
+	// Create posts table
+	db.MustExec(`
+		CREATE TABLE IF NOT EXISTS posts (
+		id SERIAL PRIMARY KEY,
+		user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+		ticker VARCHAR(20) NOT NULL,
+		body TEXT NOT NULL,
+		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+		updated_at TIMESTAMP
+		);
+	`)
+
+	// Create likes table
+	db.MustExec(`
+		CREATE TABLE IF NOT EXISTS likes (
+		id SERIAL PRIMARY KEY,
+		user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+		post_id INTEGER NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
+		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+		UNIQUE(user_id, post_id)
+		);
+	`)
+
+	// Create comments table
+	db.MustExec(`
+		CREATE TABLE IF NOT EXISTS comments (
+		id SERIAL PRIMARY KEY,
+		user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+		post_id INTEGER NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
+		body TEXT NOT NULL,
+		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+		);
+	`)
+
+	// Create followers table
+	db.MustExec(`
+		CREATE TABLE IF NOT EXISTS followers (
+		id SERIAL PRIMARY KEY,
+		follower_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+		following_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+		UNIQUE(follower_id, following_id)
+		);
+	`)
+
+	// Create indexes for posts feature
+	db.MustExec(`CREATE INDEX IF NOT EXISTS idx_posts_user_id ON posts(user_id)`)
+	db.MustExec(`CREATE INDEX IF NOT EXISTS idx_posts_created_at ON posts(created_at DESC)`)
+	db.MustExec(`CREATE INDEX IF NOT EXISTS idx_likes_post_id ON likes(post_id)`)
+	db.MustExec(`CREATE INDEX IF NOT EXISTS idx_comments_post_id ON comments(post_id)`)
+	db.MustExec(`CREATE INDEX IF NOT EXISTS idx_followers_following_id ON followers(following_id)`)
+
 	// Migration: rename profile_picture to avatar_emoji if old column exists
 	var columnExists bool
 	err := db.Get(&columnExists, `
