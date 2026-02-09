@@ -1,6 +1,8 @@
 package bootstrap
 
 import (
+	"reflect"
+
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
@@ -28,25 +30,26 @@ type Env struct {
 	SMTPFrom     string `mapstructure:"SMTP_FROM"`
 }
 
+func bindEnvs() {
+	t := reflect.TypeOf(Env{})
+	for i := 0; i < t.NumField(); i++ {
+		tag := t.Field(i).Tag.Get("mapstructure")
+		if tag != "" {
+			viper.BindEnv(tag)
+		}
+	}
+}
+
 func NewEnv() *Env {
 	env := Env{}
 	viper.SetConfigFile(".env")
+	bindEnvs()
 
-	err := viper.ReadInConfig()
-	if err != nil {
-		log.Println("No .env file found")
-
-		viper.AutomaticEnv()
-
-		err = viper.Unmarshal(&env)
-		if err != nil {
-			log.Fatal("Environment can't be loaded: ", err)
-		}
-		return &env
+	if err := viper.ReadInConfig(); err != nil {
+		log.Println("No .env file found, reading from environment variables")
 	}
 
-	err = viper.Unmarshal(&env)
-	if err != nil {
+	if err := viper.Unmarshal(&env); err != nil {
 		log.Fatal("Environment can't be loaded: ", err)
 	}
 
