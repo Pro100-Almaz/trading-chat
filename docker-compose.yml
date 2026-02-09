@@ -4,11 +4,25 @@ services:
     container_name: trading-chat-nginx
     ports:
       - "80:80"
+      - "443:443"
+    environment:
+      - SERVER_NAME=${SERVER_NAME}
     volumes:
-      - ./nginx:/etc/nginx/conf.d:ro
+      - ./nginx/templates:/etc/nginx/templates:ro
+      - certbot-webroot:/var/www/certbot:ro
+      - certbot-certs:/etc/letsencrypt:ro
     depends_on:
       - app
     restart: unless-stopped
+    networks:
+      - trading-net
+
+  certbot:
+    image: certbot/certbot
+    container_name: trading-chat-certbot
+    volumes:
+      - certbot-webroot:/var/www/certbot
+      - certbot-certs:/etc/letsencrypt
     networks:
       - trading-net
 
@@ -50,6 +64,8 @@ services:
 
 volumes:
   pgdata:
+  certbot-webroot:
+  certbot-certs:
 
 networks:
   trading-net:
