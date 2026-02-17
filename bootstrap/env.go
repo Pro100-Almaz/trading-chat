@@ -43,6 +43,7 @@ func bindEnvs() {
 func NewEnv() *Env {
 	env := Env{}
 	viper.SetConfigFile(".env")
+	viper.AutomaticEnv() // Tell Viper to automatically read from environment variables
 	bindEnvs()
 
 	if err := viper.ReadInConfig(); err != nil {
@@ -55,6 +56,11 @@ func NewEnv() *Env {
 
 	// Debug logging for database configuration
 	log.Infof("Loaded DB config: host=%s port=%s user=%s dbname=%s", env.DBHost, env.DBPort, env.DBUser, env.DBName)
+	if env.DBPass == "" {
+		log.Error("DB_PASS is EMPTY!")
+	} else {
+		log.Infof("DB_PASS is set (length: %d)", len(env.DBPass))
+	}
 
 	if env.AppEnv == "development" {
 		log.Info("The App is running in development env")
