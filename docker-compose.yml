@@ -33,6 +33,12 @@ services:
     container_name: trading-chat-api
     env_file:
       - .env
+    environment:
+      - DB_HOST=${DB_HOST:-db}
+      - DB_PORT=${DB_PORT:-5432}
+      - DB_USER=${DB_USER:-postgres}
+      - DB_PASS=${DB_PASS:-postgres}
+      - DB_NAME=${DB_NAME:-trading_chat}
     expose:
       - "8080"
     depends_on:
