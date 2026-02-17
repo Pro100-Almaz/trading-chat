@@ -73,6 +73,17 @@ definitions:
       refreshToken:
         type: string
     type: object
+  domain.LogoutRequest:
+    properties:
+      refreshToken:
+        type: string
+    type: object
+  domain.LogoutResponse:
+    properties:
+      message:
+        example: Successfully logged out
+        type: string
+    type: object
   domain.PaginatedResponse:
     properties:
       data: {}
@@ -311,6 +322,37 @@ paths:
           schema:
             $ref: '#/definitions/domain.ErrorResponse'
       summary: Login user
+      tags:
+      - Authentication
+  /logout:
+    post:
+      consumes:
+      - application/json
+      description: Logout the currently authenticated user by blacklisting their tokens
+      parameters:
+      - description: Optional refresh token to also blacklist
+        in: body
+        name: request
+        schema:
+          $ref: '#/definitions/domain.LogoutRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully logged out
+          schema:
+            $ref: '#/definitions/domain.LogoutResponse'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Logout user
       tags:
       - Authentication
   /posts:

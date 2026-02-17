@@ -46,6 +46,20 @@ func MigrateDB(db *sqlx.DB) {
 	// Create index on verification_codes for faster lookups
 	db.MustExec(`CREATE INDEX IF NOT EXISTS idx_verification_codes_user_id ON verification_codes(user_id)`)
 
+	// Create token_blacklist table
+	db.MustExec(`
+		CREATE TABLE IF NOT EXISTS token_blacklist (
+		id SERIAL PRIMARY KEY,
+		token TEXT NOT NULL UNIQUE,
+		expires_at TIMESTAMP NOT NULL,
+		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+		);
+	`)
+
+	// Create index on token_blacklist for faster lookups
+	db.MustExec(`CREATE INDEX IF NOT EXISTS idx_token_blacklist_token ON token_blacklist(token)`)
+	db.MustExec(`CREATE INDEX IF NOT EXISTS idx_token_blacklist_expires_at ON token_blacklist(expires_at)`)
+
 	// Create posts table
 	db.MustExec(`
 		CREATE TABLE IF NOT EXISTS posts (

@@ -7,10 +7,11 @@ import (
 
 	"github.com/Pro100-Almaz/trading-chat/domain"
 	"github.com/Pro100-Almaz/trading-chat/internal/tokenutil"
+	"github.com/Pro100-Almaz/trading-chat/repository"
 	"github.com/Pro100-Almaz/trading-chat/utils"
 )
 
-func JwtAuthMiddleware(secret string) func(next http.Handler) http.Handler {
+func JwtAuthMiddleware(secret string, tokenBlacklistRepo repository.TokenBlacklistRepository) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(
 			func(w http.ResponseWriter, r *http.Request) {
@@ -18,6 +19,20 @@ func JwtAuthMiddleware(secret string) func(next http.Handler) http.Handler {
 				t := strings.Split(authHeader, " ")
 				if len(t) == 2 {
 					authToken := t[1]
+
+					// Check if token is blacklisted
+					if tokenBlacklistRepo != nil {
+						isBlacklisted, err := tokenBlacklistRepo.IsBlacklisted(r.Context(), authToken)
+						if err != nil {
+							utils.JSON(w, 401, domain.ErrorResponse{Message: "Failed to verify token"})
+							return
+						}
+						if isBlacklisted {
+							utils.JSON(w, 401, domain.ErrorResponse{Message: "Token has been revoked"})
+							return
+						}
+					}
+
 					authorized, err := tokenutil.IsAuthorized(authToken, secret)
 					if err != nil {
 						utils.JSON(w, 401, domain.ErrorResponse{Message: err.Error()})
