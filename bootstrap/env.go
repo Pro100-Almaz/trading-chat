@@ -53,6 +53,9 @@ func NewEnv() *Env {
 		log.Fatal("Environment can't be loaded: ", err)
 	}
 
+	// Debug logging for database configuration
+	log.Infof("Loaded DB config: host=%s port=%s user=%s dbname=%s", env.DBHost, env.DBPort, env.DBUser, env.DBName)
+
 	if env.AppEnv == "development" {
 		log.Info("The App is running in development env")
 	}
