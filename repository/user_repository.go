@@ -81,8 +81,8 @@ func (r *userRepository) CreateUser(ctx context.Context, user *domain.User) (*do
 
 	var id int
 	err = tx.QueryRowContext(ctx,
-		`INSERT INTO users (email, password, avatar_emoji) VALUES ($1, $2, $3) RETURNING id`,
-		user.Email, user.Password, user.AvatarEmoji,
+		`INSERT INTO users (email, password, name, avatar_emoji) VALUES ($1, $2, $3, $4) RETURNING id`,
+		user.Email, user.Password, user.Name, user.AvatarEmoji,
 	).Scan(&id)
 	if err != nil {
 		tx.Rollback()

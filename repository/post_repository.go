@@ -8,7 +8,7 @@ import (
 )
 
 type PostRepository interface {
-	GetPosts(ctx context.Context, limit, offset int) ([]*domain.Post, error)
+	GetPosts(ctx context.Context, userId, limit, offset int) ([]*domain.Post, error)
 	GetFollowingPosts(ctx context.Context, userId, limit, offset int) ([]*domain.Post, error)
 	GetPostById(ctx context.Context, id int) (*domain.Post, error)
 	GetPostsByUserId(ctx context.Context, userId, limit, offset int) ([]*domain.Post, error)
@@ -27,11 +27,12 @@ func NewPostRepository(db *sqlx.DB) PostRepository {
 	return &postRepository{db: db}
 }
 
-func (r *postRepository) GetPosts(ctx context.Context, limit, offset int) ([]*domain.Post, error) {
+func (r *postRepository) GetPosts(ctx context.Context, userId, limit, offset int) ([]*domain.Post, error) {
 	var posts []*domain.Post
 	err := r.db.SelectContext(ctx, &posts,
-		`SELECT * FROM posts ORDER BY created_at DESC LIMIT $1 OFFSET $2`,
-		limit, offset)
+		`SELECT * FROM posts WHERE user_id != $1
+         ORDER BY created_at DESC LIMIT $2 OFFSET $3 `,
+		userId, limit, offset)
 	if err != nil {
 		return nil, err
 	}

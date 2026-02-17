@@ -37,7 +37,7 @@ func (uc *postUseCase) GetGlobalFeed(ctx context.Context, userId, limit, offset 
 	ctx, cancel := context.WithTimeout(ctx, uc.contextTimeout)
 	defer cancel()
 
-	posts, err := uc.postRepository.GetPosts(ctx, limit, offset)
+	posts, err := uc.postRepository.GetPosts(ctx, userId, limit, offset)
 	if err != nil {
 		return nil, err
 	}
