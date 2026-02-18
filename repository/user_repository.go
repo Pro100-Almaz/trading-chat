@@ -121,8 +121,8 @@ func (r *userRepository) UpdateUser(ctx context.Context, user *domain.User) erro
 	if user.Password != "" {
 		fieldsQuery += "password = :password,"
 	}
-	if user.Phone != "" {
-		fieldsQuery += "phone = :phone,"
+	if user.BrokerId != nil {
+		fieldsQuery += "broker_id = :broker_id,"
 	}
 	if user.AvatarEmoji > 0 {
 		fieldsQuery += "avatar_emoji = :avatar_emoji,"

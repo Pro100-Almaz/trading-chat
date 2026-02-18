@@ -25,7 +25,6 @@ func MigrateDB(db *sqlx.DB) {
 		name VARCHAR(255) DEFAULT '',
 		password VARCHAR(255) DEFAULT '',
 		email VARCHAR(255) NOT NULL UNIQUE,
-		phone VARCHAR(255) DEFAULT '',
 		is_verified BOOLEAN DEFAULT FALSE,
 		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 		updated_at TIMESTAMP
