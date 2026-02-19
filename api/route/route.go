@@ -9,9 +9,10 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/jmoiron/sqlx"
+	"github.com/redis/go-redis/v9"
 )
 
-func Setup(env *bootstrap.Env, timeout time.Duration, db *sqlx.DB, r *mux.Router) {
+func Setup(env *bootstrap.Env, timeout time.Duration, db *sqlx.DB, redisClient *redis.Client, r *mux.Router) {
 	public := r.PathPrefix("/api").Subrouter()
 	protectedRouter := r.PathPrefix("/api").Subrouter()
 
@@ -32,6 +33,6 @@ func Setup(env *bootstrap.Env, timeout time.Duration, db *sqlx.DB, r *mux.Router
 	NewLogoutRouter(env, timeout, db, protectedRouter)
 	NewUserRouter(env, timeout, db, protectedRouter)
 	NewVerificationRouter(env, timeout, db, public)
-	NewPostRouter(env, timeout, db, protectedRouter)
+	NewPostRouter(env, timeout, db, redisClient, protectedRouter)
 	NewFollowerRouter(env, timeout, db, protectedRouter)
 }

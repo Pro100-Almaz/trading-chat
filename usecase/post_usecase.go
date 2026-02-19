@@ -10,11 +10,13 @@ import (
 )
 
 type postUseCase struct {
-	postRepository    repository.PostRepository
-	userRepository    repository.UserRepository
-	likeRepository    repository.LikeRepository
-	commentRepository repository.CommentRepository
-	contextTimeout    time.Duration
+	postRepository     repository.PostRepository
+	userRepository     repository.UserRepository
+	likeRepository     repository.LikeRepository
+	commentRepository  repository.CommentRepository
+	viewsRedisRepo     repository.PostViewsRedisRepository
+	viewsDBRepo        repository.PostViewsDBRepository
+	contextTimeout     time.Duration
 }
 
 func NewPostUseCase(
@@ -22,14 +24,18 @@ func NewPostUseCase(
 	userRepo repository.UserRepository,
 	likeRepo repository.LikeRepository,
 	commentRepo repository.CommentRepository,
+	viewsRedisRepo repository.PostViewsRedisRepository,
+	viewsDBRepo repository.PostViewsDBRepository,
 	timeout time.Duration,
 ) domain.PostUseCase {
 	return &postUseCase{
-		postRepository:    postRepo,
-		userRepository:    userRepo,
-		likeRepository:    likeRepo,
-		commentRepository: commentRepo,
-		contextTimeout:    timeout,
+		postRepository:     postRepo,
+		userRepository:     userRepo,
+		likeRepository:     likeRepo,
+		commentRepository:  commentRepo,
+		viewsRedisRepo:     viewsRedisRepo,
+		viewsDBRepo:        viewsDBRepo,
+		contextTimeout:     timeout,
 	}
 }
 
@@ -196,3 +202,13 @@ func (uc *postUseCase) enrichPost(ctx context.Context, post *domain.Post, userId
 		IsLiked:       isLiked,
 	}, nil
 }
+
+// TrackBatchViews tracks view events for multiple posts in Redis
+func (uc *postUseCase) TrackBatchViews(ctx context.Context, postIds []int) error {
+	ctx, cancel := context.WithTimeout(ctx, uc.contextTimeout)
+	defer cancel()
+
+	// Increment views in Redis (fast, asynchronous)
+	return uc.viewsRedisRepo.IncrementViews(ctx, postIds)
+}
+

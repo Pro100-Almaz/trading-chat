@@ -9,7 +9,9 @@ import (
 
 	"github.com/Pro100-Almaz/trading-chat/api/route"
 	"github.com/Pro100-Almaz/trading-chat/bootstrap"
+	"github.com/Pro100-Almaz/trading-chat/repository"
 	"github.com/Pro100-Almaz/trading-chat/utils"
+	"github.com/Pro100-Almaz/trading-chat/worker"
 
 	_ "github.com/Pro100-Almaz/trading-chat/docs"
 
@@ -34,11 +36,19 @@ func main() {
 	app := bootstrap.App()
 	env := app.Env
 	db := app.Postgres
+	redisClient := app.Redis
 	defer app.CloseDBConnection()
 
 	utils.MigrateDB(db)
 
 	timeout := time.Duration(env.ContextTimeout) * time.Second
+
+	// Start post views worker
+	viewsRedisRepo := repository.NewPostViewsRedisRepository(redisClient)
+	viewsDBRepo := repository.NewPostViewsDBRepository(db)
+	viewsWorker := worker.NewPostViewsWorker(viewsRedisRepo, viewsDBRepo, 30*time.Second)
+	go viewsWorker.Start()
+	defer viewsWorker.Stop()
 
 	r := mux.NewRouter()
 
@@ -48,7 +58,7 @@ func main() {
 		httpSwagger.DeepLinking(true),
 	))
 
-	route.Setup(env, timeout, db, r)
+	route.Setup(env, timeout, db, redisClient, r)
 
 	srv := &http.Server{
 		Addr:         env.ServerAddress,

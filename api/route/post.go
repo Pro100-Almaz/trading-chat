@@ -9,15 +9,18 @@ import (
 	"github.com/Pro100-Almaz/trading-chat/usecase"
 	"github.com/gorilla/mux"
 	"github.com/jmoiron/sqlx"
+	"github.com/redis/go-redis/v9"
 )
 
-func NewPostRouter(env *bootstrap.Env, timeout time.Duration, db *sqlx.DB, r *mux.Router) {
+func NewPostRouter(env *bootstrap.Env, timeout time.Duration, db *sqlx.DB, redisClient *redis.Client, r *mux.Router) {
 	postRepo := repository.NewPostRepository(db)
 	userRepo := repository.NewUserRepository(db)
 	likeRepo := repository.NewLikeRepository(db)
 	commentRepo := repository.NewCommentRepository(db)
+	viewsRedisRepo := repository.NewPostViewsRedisRepository(redisClient)
+	viewsDBRepo := repository.NewPostViewsDBRepository(db)
 
-	postUseCase := usecase.NewPostUseCase(postRepo, userRepo, likeRepo, commentRepo, timeout)
+	postUseCase := usecase.NewPostUseCase(postRepo, userRepo, likeRepo, commentRepo, viewsRedisRepo, viewsDBRepo, timeout)
 	likeUseCase := usecase.NewLikeUseCase(likeRepo, postRepo, timeout)
 	commentUseCase := usecase.NewCommentUseCase(commentRepo, postRepo, userRepo, timeout)
 
@@ -44,6 +47,7 @@ func NewPostRouter(env *bootstrap.Env, timeout time.Duration, db *sqlx.DB, r *mu
 	postsGroup.HandleFunc("/user/{id}", postController.GetUserPosts).Methods("GET")
 	postsGroup.HandleFunc("/{id}", postController.GetPost).Methods("GET")
 	postsGroup.HandleFunc("/{id}", postController.DeletePost).Methods("DELETE")
+	postsGroup.HandleFunc("/views/batch", postController.TrackBatchViews).Methods("POST")
 
 	// Likes routes
 	postsGroup.HandleFunc("/{id}/like", likeController.LikePost).Methods("POST")

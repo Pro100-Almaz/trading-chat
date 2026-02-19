@@ -22,6 +22,7 @@ type PostResponse struct {
 	Author        Author    `json:"author"`
 	LikesCount    int       `json:"likes_count"`
 	CommentsCount int       `json:"comments_count"`
+	ViewsCount    int64     `json:"views_count"`
 	IsLiked       bool      `json:"is_liked"`
 }
 
@@ -36,6 +37,15 @@ type CreatePostRequest struct {
 	Body   string `json:"body" example:"I think this stock is going up!"`
 }
 
+type BatchViewRequest struct {
+	PostIds []int `json:"post_ids" example:"1,2,3,4,5"`
+}
+
+type BatchViewResponse struct {
+	Message string `json:"message" example:"Views tracked successfully"`
+	Count   int    `json:"count" example:"5"`
+}
+
 type PostUseCase interface {
 	GetGlobalFeed(ctx context.Context, userId, limit, offset int) (*PaginatedResponse, error)
 	GetFollowingFeed(ctx context.Context, userId, limit, offset int) (*PaginatedResponse, error)
@@ -43,4 +53,5 @@ type PostUseCase interface {
 	GetPostById(ctx context.Context, userId, postId int) (*PostResponse, error)
 	CreatePost(ctx context.Context, userId int, request *CreatePostRequest) (*PostResponse, error)
 	DeletePost(ctx context.Context, userId, postId int) error
+	TrackBatchViews(ctx context.Context, postIds []int) error
 }

@@ -229,3 +229,50 @@ func getPaginationParams(r *http.Request) (limit, offset int) {
 
 	return limit, offset
 }
+
+// TrackBatchViews godoc
+// @Summary Track batch post views
+// @Description Track views for multiple posts in a single request
+// @Tags Posts
+// @Accept json
+// @Produce json
+// @Param request body domain.BatchViewRequest true "Post IDs to track"
+// @Success 200 {object} domain.BatchViewResponse "Views tracked successfully"
+// @Failure 400 {object} domain.ErrorResponse "Bad request"
+// @Router /posts/views/batch [post]
+func (pc *PostController) TrackBatchViews(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	var request domain.BatchViewRequest
+
+	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+		log.Error(err)
+		utils.JSON(w, http.StatusBadRequest, domain.ErrorResponse{Message: "Invalid request body"})
+		return
+	}
+
+	if len(request.PostIds) == 0 {
+		utils.JSON(w, http.StatusBadRequest, domain.ErrorResponse{Message: "No post IDs provided"})
+		return
+	}
+
+	// Limit batch size to prevent abuse
+	if len(request.PostIds) > 100 {
+		utils.JSON(w, http.StatusBadRequest, domain.ErrorResponse{Message: "Maximum 100 post IDs per request"})
+		return
+	}
+
+	err := pc.PostUseCase.TrackBatchViews(ctx, request.PostIds)
+	if err != nil {
+		log.Error("Failed to track batch views: ", err)
+		utils.JSON(w, http.StatusInternalServerError, domain.ErrorResponse{Message: "Failed to track views"})
+		return
+	}
+
+	response := domain.BatchViewResponse{
+		Message: "Views tracked successfully",
+		Count:   len(request.PostIds),
+	}
+
+	utils.JSON(w, http.StatusOK, response)
+}
+

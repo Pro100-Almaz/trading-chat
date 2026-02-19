@@ -71,6 +71,15 @@ func MigrateDB(db *sqlx.DB) {
 		);
 	`)
 
+	// Create post_views table
+	db.MustExec(`
+		CREATE TABLE IF NOT EXISTS post_views (
+		post_id INTEGER PRIMARY KEY REFERENCES posts(id) ON DELETE CASCADE,
+		views_count BIGINT DEFAULT 0,
+		updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+		);
+	`)
+
 	// Create likes table
 	db.MustExec(`
 		CREATE TABLE IF NOT EXISTS likes (
